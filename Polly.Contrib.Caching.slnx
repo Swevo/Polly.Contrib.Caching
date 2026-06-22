@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Polly.Contrib.Caching/Polly.Contrib.Caching.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Polly.Contrib.Caching.Tests/Polly.Contrib.Caching.Tests.csproj" />
+  </Folder>
+</Solution>

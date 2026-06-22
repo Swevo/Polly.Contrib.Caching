@@ -1,0 +1,88 @@
+# Polly.Contrib.Caching
+
+<img src="icon.png" width="100" align="right" />
+
+[![NuGet](https://img.shields.io/nuget/v/Polly.Contrib.Caching.svg)](https://www.nuget.org/packages/Polly.Contrib.Caching)
+[![CI](https://github.com/Swevo/Polly.Contrib.Caching/actions/workflows/build.yml/badge.svg)](https://github.com/Swevo/Polly.Contrib.Caching/actions/workflows/build.yml)
+
+A caching resilience strategy for **Polly v8** pipelines. Restores the beloved Polly v7 caching policy for the new `DelayGenerator`-based API.
+
+Polly v8 dropped the built-in caching policy. This package brings it back as a proper `ResilienceStrategy<T>` that plugs into any `ResiliencePipelineBuilder<TResult>`.
+
+## Install
+
+```
+dotnet add package Polly.Contrib.Caching
+```
+
+## Usage
+
+### With `IMemoryCache` (recommended)
+
+```csharp
+using Microsoft.Extensions.Caching.Memory;
+using Polly.Contrib.Caching;
+
+var cache = new MemoryCache(new MemoryCacheOptions());
+
+var pipeline = new ResiliencePipelineBuilder<HttpResponseMessage>()
+    .AddCaching(
+        cache,
+        cacheKeyProvider: ctx => ctx.Properties.TryGetValue(new ResiliencePropertyKey<string>("url"), out var url) ? url : null,
+        ttl: TimeSpan.FromMinutes(5))
+    .AddRetry(new RetryStrategyOptions<HttpResponseMessage>
+    {
+        MaxRetryAttempts = 3,
+    })
+    .Build();
+```
+
+### With `CachingStrategyOptions`
+
+```csharp
+var pipeline = new ResiliencePipelineBuilder<string>()
+    .AddCaching(new CachingStrategyOptions<string>
+    {
+        CacheProvider = new MemoryCacheProvider<string>(cache),
+        CacheKeyProvider = ctx => ctx.OperationKey,
+        Ttl = TimeSpan.FromMinutes(10),
+    })
+    .Build();
+```
+
+### Custom `ICacheProvider`
+
+Implement `ICacheProvider<TResult>` to use any cache store — distributed cache, Redis, etc.
+
+```csharp
+public sealed class RedisCacheProvider<TResult>(IConnectionMultiplexer redis) : ICacheProvider<TResult>
+{
+    public bool TryGet(string key, out TResult? value) { /* ... */ }
+    public void Set(string key, TResult? value, TimeSpan ttl) { /* ... */ }
+}
+```
+
+## Behaviour
+
+| Scenario | Outcome |
+|---|---|
+| Cache hit | Returns cached result; downstream **not** called |
+| Cache miss | Calls downstream; caches result on success |
+| Downstream throws | Exception propagates; nothing cached |
+| `CacheKeyProvider` returns `null` | Caching skipped; downstream always called |
+
+## Composition with other strategies
+
+Place `AddCaching` **before** retry/circuit-breaker so a cached result short-circuits the entire pipeline:
+
+```csharp
+var pipeline = new ResiliencePipelineBuilder<string>()
+    .AddCaching(cache, ctx => ctx.OperationKey)   // 1. check cache first
+    .AddRetry(...)                                  // 2. retry on failure
+    .AddCircuitBreaker(...)                         // 3. protect downstream
+    .Build();
+```
+
+## License
+
+MIT
