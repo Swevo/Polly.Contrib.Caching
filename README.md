@@ -83,6 +83,14 @@ var pipeline = new ResiliencePipelineBuilder<string>()
     .Build();
 ```
 
+## Support
+
+If Polly.Contrib.Caching saves you time restoring the v7 caching policy, consider supporting the project:
+
+[![Sponsor](https://img.shields.io/badge/Sponsor-%E2%9D%A4-pink?logo=github)](https://github.com/sponsors/Swevo)
+
+> 💼 **Need .NET resilience help?** Visit [solidqualitysolutions.com](https://solidqualitysolutions.com/) for consulting and architecture services.
+
 ## License
 
 MIT
