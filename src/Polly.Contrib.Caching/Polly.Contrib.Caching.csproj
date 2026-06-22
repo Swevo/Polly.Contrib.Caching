@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFrameworks>net6.0;net8.0;net9.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
@@ -11,7 +11,10 @@
     <Version>1.0.0</Version>
     <Authors>Justin Bannister</Authors>
     <Description>A caching resilience strategy for Polly v8 pipelines. Restores the beloved Polly v7 caching policy for the new DelayGenerator-based API, backed by IMemoryCache or any custom ICacheProvider.</Description>
-    <PackageTags>polly;caching;resilience;memorycache;retry;pipeline</PackageTags>
+    <PackageTags>polly;caching;resilience;memorycache;cache-aside;icache;idistributedcache;redis;ttl;dotnet;aspnetcore;fault-tolerance</PackageTags>
+    <Title>Polly.Contrib.Caching — Caching resilience strategy for Polly v8</Title>
+    <PackageSummary>Restores the Polly v7 CachePolicy for Polly v8. Cache-aside pattern backed by IMemoryCache or any custom ICacheProvider — supports Redis via a simple adapter.</PackageSummary>
+    <PackageReleaseNotes>1.0.1: Initial NuGet release. Caching resilience strategy for Polly v8 resilience pipelines. Supports net6.0, net8.0, and net9.0.</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/Swevo/Polly.Contrib.Caching</RepositoryUrl>
